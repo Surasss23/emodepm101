@@ -30,7 +30,7 @@ main{width:min(100% - 32px,690px);margin:0 auto;flex:1;display:flex;flex-directi
 .payment{max-width:440px;width:100%;margin:auto;text-align:center}.payment h1{font-size:30px;letter-spacing:-1.2px;margin:8px 0}.payment p{color:var(--muted);font-size:13px}
 .qrbox{width:224px;height:224px;border:1px solid var(--line);border-radius:15px;margin:20px auto 12px;display:grid;place-items:center;background:#fff;padding:10px}
 .qrbox img,.qrbox canvas{max-width:100%;height:auto!important}.amount{font-size:28px;font-weight:780}
-.payment .primary{width:100%;margin-top:10px}.utr-form{display:flex;gap:8px;margin-top:13px}.utr-form input{min-width:0;flex:1}.utr-form button{white-space:nowrap}
+.payment .primary{width:100%;margin-top:10px}.utr-title{font-size:13px;font-weight:700;color:#333;margin:22px 0 8px}.utr-form{display:grid;grid-template-columns:1fr;gap:9px;margin-top:0}.utr-form input{width:100%;min-width:0}.utr-form button{width:100%}.payment-hint{font-size:11px;color:#999;margin:9px 0 0}
 .field{width:100%;border:1px solid #dedede;border-radius:10px;padding:12px 14px;outline:none;background:#fff;font-size:16px!important;line-height:1.35;min-height:48px}
 .field:focus{border-color:#888;box-shadow:0 0 0 3px #00000008}
 .back{border:0;background:none;color:var(--muted);padding:8px 0;font-size:13px}
@@ -77,9 +77,10 @@ main{width:min(100% - 32px,690px);margin:0 auto;flex:1;display:flex;flex-directi
 <section id="payment" class="screen payment">
  <button class="back" onclick="show('home')">← Back</button><div class="eyebrow">CEO ACCESS</div><h1>Welcome to the boardroom.</h1><p>Complete your ₹59 UPI payment to continue.</p><div class="amount">₹59.00</div>
  <div class="qrbox" id="qr"><span style="color:#888;font-size:12px">Preparing your QR…</span></div><p style="font-size:12px">Scan with any UPI app</p>
- <button class="primary" onclick="payWithUpi()">Pay ₹59 with UPI</button>
- <form class="utr-form" id="utrForm"><input class="field" id="utrInput" required minlength="6" maxlength="30" placeholder="Enter UTR / transaction ID" autocomplete="off"><button class="primary" type="submit">Submit</button></form>
- <p style="font-size:11px;margin-top:9px">After submitting, WhatsApp opens with your payment reference ready to send.</p>
+ <button class="primary" onclick="payWithUpi()">Pay ₹59</button>
+ <div class="utr-title">Already paid? Enter your UTR</div>
+ <form class="utr-form" id="utrForm"><input class="field" id="utrInput" required minlength="6" maxlength="30" placeholder="Enter UTR / transaction ID" autocomplete="off" autocapitalize="characters"><button class="primary" type="submit">Submit UTR</button></form>
+ <p class="payment-hint">Your UTR will open in WhatsApp so we can verify your payment.</p>
 </section>
 <section id="chat" class="screen">
  <div class="chat">
@@ -93,7 +94,7 @@ main{width:min(100% - 32px,690px);margin:0 auto;flex:1;display:flex;flex-directi
  <div class="chat"><div class="eyebrow">Investigation complete</div><h1 style="font-size:34px;letter-spacing:-1.5px">The report is ready.</h1><div class="result" id="result"></div><div class="result-actions"><button class="secondary" onclick="shareResult()">Share result</button><button class="primary" onclick="restart()">Start again</button></div></div>
 </section>
 </main>
-<footer class="footer">CheatGpt · Your file has been reviewed. The committee has questions.</footer>
+<footer class="footer">CheatGpt · Your file has been reviewed. The committee has questions.<br>Created by <a href="https://www.instagram.com/surass_23?vrfl=dWlwaW84b3J2eGY3&utm_source=qr" target="_blank" rel="noopener noreferrer" style="color:#555;font-weight:700;text-decoration:none">Surass_23</a></footer>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script>
@@ -124,7 +125,7 @@ function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.re
 function choosePlan(p){plan=p;if(p==='CEO'){show('payment');setTimeout(makeQr,80)}else startChat()}
 function makeQr(){const uri='upi://pay?pa='+encodeURIComponent(UPI_ID)+'&pn='+encodeURIComponent('CheatGpt')+'&am=59.00&cu=INR&tn='+encodeURIComponent('CheatGpt CEO access');const box=document.getElementById('qr');box.innerHTML='';if(window.QRCode){new QRCode(box,{text:uri,width:200,height:200,colorDark:'#111111',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M})}else{box.textContent='QR unavailable. Use the UPI payment button.'}}
 function payWithUpi(){const uri='upi://pay?pa='+encodeURIComponent(UPI_ID)+'&pn='+encodeURIComponent('CheatGpt')+'&am=59.00&cu=INR&tn='+encodeURIComponent('CheatGpt CEO access');window.location.href=uri}
-document.getElementById('utrForm').addEventListener('submit',e=>{e.preventDefault();const utr=document.getElementById('utrInput').value.trim();if(utr.length<6){alert('Please enter a valid UTR or transaction reference.');return}const msg='Hello, I have completed the CheatGpt CEO payment of ₹59.\nName: [Your name]\nUTR / Transaction ID: '+utr+'\nPlease verify my payment and confirm CEO access.';window.open('https://wa.me/'+WHATSAPP_NUMBER+'?text='+encodeURIComponent(msg),'_blank','noopener')});
+document.getElementById('utrForm').addEventListener('submit',e=>{e.preventDefault();const utr=document.getElementById('utrInput').value.trim().replace(/\\s+/g,'').toUpperCase();if(!/^[A-Z0-9-]{6,30}$/.test(utr)){alert('Please enter a valid UTR or transaction reference.');return}const msg='CheatGpt CEO payment verification\\nAmount: ₹59\\nUTR: '+utr;const url='https://wa.me/'+WHATSAPP_NUMBER+'?text='+encodeURIComponent(msg);window.location.href=url});
 function startChat(){profile={};answers=[];profileIndex=0;questionIndex=0;document.getElementById('messages').innerHTML='';document.getElementById('planLabel').textContent=plan+' · Investigation in progress';show('chat');addMessage('Welcome to CheatGpt. Let us get the basics out of the way. The committee is waiting.');setTimeout(renderProfile,260)}
 function addMessage(text,who='bot'){const d=document.createElement('div');d.className=who;d.textContent=text;document.getElementById('messages').appendChild(d);const m=document.getElementById('messages');m.scrollTop=m.scrollHeight}
 function updateProgress(label,current,total){document.getElementById('stepLabel').textContent=label+' · '+current+'/'+total;document.getElementById('progress').style.width=(current/total*100)+'%'}
